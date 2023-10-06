@@ -1,52 +1,81 @@
-// Definir la clase Tarea
-class Tarea {
-    constructor(indicador, descripcion) {
-      this.indicador = indicador;
-      this.descripcion = descripcion;
-      this.completada = false;
+//Lista de tareas en node 
+
+//Definir lista de tareas y las funciones
+
+let tareas = [];
+
+function agregarTarea(id, descripcion) {
+  return new Promise((resolve, reject) => {
+    const tarea = { id, descripcion, estado: false };
+    tareas.push(tarea);
+    resolve('Tarea añadida con éxito');
+  });
+}
+
+function eliminarTarea(id) {
+  return new Promise((resolve, reject) => {
+    const tareaIndex = tareas.findIndex(tarea => tarea.id === id);
+    if (tareaIndex !== -1) {
+      tareas.splice(tareaIndex, 1);
+      resolve('Tarea eliminada con éxito');
+    } else {
+      reject('Tarea no encontrada');
     }
+  });
+}
+
+function tareaCompleta(id) {
+  return new Promise((resolve, reject) => {
+    const tarea = tareas.find(tarea => tarea.id === id);
+    if (tarea) {
+      tarea.completa = true;
+      resolve('Tarea completada');
+    } else {
+      reject('Tarea no encontrada');
+    }
+  });
+}
+
+//Aqui se ustiliza async/await para manejar las promesas 
+async function main() {
+  try {
+    await agregarTarea(1, 'Hacer la compra');
+    await agregarTarea(2, 'Hacer ejercicio');
+    await agregarTarea(3, 'Estudiar para el examen');
+    console.log(tareas);
+
+    await tareaCompleta(1);
+    console.log(tareas);
+
+    await eliminarTarea(2);
+    console.log(tareas);
+  } catch (error) {
+    console.error(error);
   }
-  
-  // Definir la clase ListaTareas
-  class ListaTareas {
-    constructor() {
-      this.tareas = [];
-    }
-  
-    // Función para añadir una tarea a la lista
-    añadirTarea(indicador, descripcion) {
-      const tarea = new Tarea(indicador, descripcion);
-      this.tareas.push(tarea);
-    }
-  
-    // Función para eliminar una tarea de la lista
-    eliminarTarea(indicador) {
-      this.tareas = this.tareas.filter(tarea => tarea.indicador !== indicador);
-    }
-  
-    // Función para marcar una tarea como completada
-    completarTarea(indicador) {
-      this.tareas.forEach(tarea => {
-        if (tarea.indicador === indicador) {
-          tarea.completada = true;
-        }
-      });
-    }
-  }
-  
-  // Crear una instancia de la lista de tareas
-  const lista = new ListaTareas();
-  
-  // Añadir tareas a la lista
-  lista.añadirTarea("1", "Hacer la compra");
-  lista.añadirTarea("2", "Limpiar la casa");
-  
-  // Completar una tarea
-  lista.completarTarea("1");
-  
-  // Eliminar una tarea
-  lista.eliminarTarea("2");
-  
-  // Mostrar las tareas en la consola
-  console.log(lista.tareas);
-  
+}
+
+main();
+
+
+//servidor web 
+const http = require('http');
+
+const host = 'localhost';
+const port = 8080;
+
+
+const edificio = function(request, response) {
+
+    const url = new URL(request.url, 'http://localhost:8080/');
+
+    //Procedimiento
+    response.writeHead(200, {'content-type': 'application/json'});
+    response.write('Lista de tareas');
+    response.end();
+}
+
+const server = http.createServer(edificio);
+server.listen(port, host, () => {
+    console.log('El servidor esta corriendo en: http://localhost:/8080/');
+})
+
